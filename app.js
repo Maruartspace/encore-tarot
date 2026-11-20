@@ -156,7 +156,7 @@ function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0
 
 function layoutFan(spread){
   const cards = [...fan.children], n = cards.length;
-  const span = Math.min(118, 70 + innerWidth / 20);           // degrees
+  const span = innerWidth < 640 ? 76 : Math.min(118, 70 + innerWidth / 20);   // degrees; tighter on phones so bigger cards fit
   cards.forEach((c, i) => {
     const k = n > 1 ? i / (n - 1) - .5 : 0;
     c.style.setProperty("--r", (spread ? k * span : (Math.random()-.5)*4) + "deg");
@@ -272,6 +272,8 @@ function resetReading(){
 }
 function backToFan(){ resetReading(); readingSec.scrollIntoView({behavior:"smooth"}); }
 again.addEventListener("click", () => { if (history.state && history.state.encore === "done") history.back(); else backToFan(); });
+// floating "new reading" button only while the reading is on screen
+new IntersectionObserver(es => again.classList.toggle("away", !es[0].isIntersecting), {rootMargin:"0px 0px -40% 0px"}).observe(document.getElementById("verdict"));
 addEventListener("popstate", () => { if (readingSec.classList.contains("complete")) backToFan(); });
 
 /* ================= CARD OF THE DAY ================= */
