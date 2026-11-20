@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ENCORE — Rock Tarot</title>
+<meta name="description" content="Rock 'n' roll tarot deck. Strike the lighter, draw three cards.">
+<meta name="theme-color" content="#050403">
+<link rel="preload" as="image" href="back.webp">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- Light: a big darkness layer with a hole that travels with the flame, plus the flame itself -->
+<div class="night" aria-hidden="true"></div>
+<div class="glow" id="glow" aria-hidden="true"></div>
+<canvas class="flame" id="flame" aria-hidden="true"></canvas>
+
+<!-- Intro -->
+<section class="intro" id="intro">
+  <p class="intro__hint" data-i18n="hold">Mantén pulsado para encender</p>
+  <button class="intro__btn" id="strike" data-i18n-aria="holdAria" aria-label="Encender"><span class="intro__ring"></span></button>
+</section>
+
+<header class="top">
+  <a class="brand" href="#">ENCORE<span>rock tarot</span></a>
+  <nav class="langs" aria-label="Idioma">
+    <button data-lang="es">ES</button>
+    <button data-lang="en">EN</button>
+    <button data-lang="ca">CA</button>
+  </nav>
+</header>
+
+<main>
+  <!-- 1. Reading -->
+  <section class="reading" id="reading">
+    <h1 class="title" data-i18n="title">Tres cartas. Un escenario.</h1>
+
+    <div class="pickbar">
+      <p class="sub" id="prompt">Toca una carta para sacarla</p>
+      <p class="count" id="count">0 / 3</p>
+    </div>
+
+    <div class="fan" id="fan"></div>
+    <p class="swipe" id="swipe"></p>
+
+    <div class="slots" id="slots">
+      <div class="slot" data-pos="0"><div class="slot__frame"><span class="slot__num">1</span></div><p class="slot__label" data-i18n="past">Pasado</p><div class="slot__text"></div></div>
+      <div class="slot" data-pos="1"><div class="slot__frame"><span class="slot__num">2</span></div><p class="slot__label" data-i18n="present">Presente</p><div class="slot__text"></div></div>
+      <div class="slot" data-pos="2"><div class="slot__frame"><span class="slot__num">3</span></div><p class="slot__label" data-i18n="future">Futuro</p><div class="slot__text"></div></div>
+    </div>
+
+    <article class="verdict" id="verdict" aria-live="polite"></article>
+
+    <button class="again" id="again" hidden data-i18n="again">Barajar otra vez</button>
+  </section>
+
+  <!-- 2. Card of the day -->
+  <section class="today" id="today">
+    <p class="kicker" data-i18n="todayKicker">Carta del día</p>
+    <div class="today__wrap">
+      <button class="today__card" id="todayCard"></button>
+      <div class="today__text">
+        <h2 id="todayName"></h2>
+        <p id="todayMeaning"></p>
+        <p class="today__note" data-i18n="todayNote">La misma para todos hoy. Mañana sale otra.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Deck -->
+  <section class="deck" id="deck">
+    <p class="kicker" data-i18n="deckKicker">La baraja · 22 arcanos</p>
+    <div class="grid" id="grid"></div>
+  </section>
+</main>
+
+<footer class="foot">
+  <p class="foot__disc" data-i18n="disclaimer">Lecturas para entretenimiento y reflexión.</p>
+  <p class="foot__row">
+    <button class="link" id="legalBtn" data-i18n="legal">Aviso legal y privacidad</button>
+    <span>design &amp; code: Maru</span>
+  </p>
+</footer>
+
+<!-- Card zoom -->
+<div class="zoom" id="zoom" hidden>
+  <button class="zoom__close" aria-label="Close">×</button>
+  <img id="zoomImg" alt="">
+  <p class="zoom__cap" id="zoomCap"></p>
+</div>
+
+<!-- Legal -->
+<dialog class="legal" id="legal">
+  <div class="legal__body" id="legalBody"></div>
+  <form method="dialog"><button class="again" data-i18n="close">Cerrar</button></form>
+</dialog>
+
+<script src="reading.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
