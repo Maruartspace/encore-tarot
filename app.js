@@ -98,21 +98,21 @@ const CARDS = [
 const UI = {
  es:{hold:"Mantén pulsado para encender",holdAria:"Encender el mechero",title:"Tres cartas. Un escenario.",pick:"Toca una carta para sacarla",
      pick2:"Saca la segunda",pick3:"Y la tercera",done:"Tu lectura está servida",
-     past:"Pasado",present:"Presente",future:"Futuro",again:"Barajar otra vez",swipe:"Desliza el dedo por el abanico y suelta en tu carta",draw:"Sacar",todayKicker:"Carta del día",
+     past:"Pasado",present:"Presente",future:"Futuro",again:"↺ Nueva tirada",swipe:"Desliza el dedo por el abanico y suelta en tu carta",draw:"Sacar",todayKicker:"Carta del día",
      todayNote:"La misma para todos hoy. Mañana sale otra.",deckKicker:"La baraja · 22 arcanos",soon:"Próximamente",
      disclaimer:"Lecturas para entretenimiento y reflexión. No predicen el futuro ni sustituyen el consejo de ningún profesional.",
      legal:"Aviso legal y privacidad",close:"Cerrar",
      legalHtml:`<h3>Aviso legal</h3><p>Titular: [NOMBRE] · NIF: [NIF] · [DIRECCIÓN] · [EMAIL]</p><p>Proyecto artístico de demostración. No se venden productos ni servicios.</p><h3>Privacidad</h3><p>Este sitio no recoge datos personales, no usa formularios, no instala cookies ni guarda nada en tu navegador. No hay analítica ni servicios de terceros.</p><p>Las ilustraciones son originales del proyecto. Las lecturas son para entretenimiento y reflexión.</p>`},
  en:{hold:"Press and hold to light",holdAria:"Strike the lighter",title:"Three cards. One stage.",pick:"Tap a card to draw it",
      pick2:"Draw the second",pick3:"And the third",done:"Your reading is served",
-     past:"Past",present:"Present",future:"Future",again:"Shuffle again",swipe:"Slide your finger across the fan and release on your card",draw:"Draw",todayKicker:"Card of the day",
+     past:"Past",present:"Present",future:"Future",again:"↺ New reading",swipe:"Slide your finger across the fan and release on your card",draw:"Draw",todayKicker:"Card of the day",
      todayNote:"The same for everyone today. Tomorrow brings another.",deckKicker:"The deck · 22 arcana",soon:"Coming soon",
      disclaimer:"Readings for entertainment and reflection. They don't predict the future or replace advice from any professional.",
      legal:"Legal notice & privacy",close:"Close",
      legalHtml:`<h3>Legal notice</h3><p>Owner: [NAME] · Tax ID: [NIF] · [ADDRESS] · [EMAIL]</p><p>Artistic demo project. No products or services are sold.</p><h3>Privacy</h3><p>This site collects no personal data, has no forms, sets no cookies and stores nothing in your browser. No analytics, no third-party services.</p><p>Illustrations are original to the project. Readings are for entertainment and reflection.</p>`},
  ca:{hold:"Mantén premut per encendre",holdAria:"Encendre l'encenedor",title:"Tres cartes. Un escenari.",pick:"Toca una carta per treure-la",
      pick2:"Treu la segona",pick3:"I la tercera",done:"La teva lectura està servida",
-     past:"Passat",present:"Present",future:"Futur",again:"Tornar a barrejar",swipe:"Llisca el dit pel ventall i deixa anar a la teva carta",draw:"Treure",todayKicker:"Carta del dia",
+     past:"Passat",present:"Present",future:"Futur",again:"↺ Nova tirada",swipe:"Llisca el dit pel ventall i deixa anar a la teva carta",draw:"Treure",todayKicker:"Carta del dia",
      todayNote:"La mateixa per a tothom avui. Demà en surt una altra.",deckKicker:"La baralla · 22 arcans",soon:"Properament",
      disclaimer:"Lectures per a entreteniment i reflexió. No prediuen el futur ni substitueixen el consell de cap professional.",
      legal:"Avís legal i privacitat",close:"Tancar",
@@ -128,6 +128,9 @@ const t = k => UI[lang][k];
 function applyLang(){
   document.documentElement.lang = lang;
   document.querySelectorAll("[data-i18n]").forEach(el => el.textContent = t(el.dataset.i18n));
+  // title: each sentence on its own line ("Tres cartas." / "Un escenario.")
+  const ttl = document.querySelector(".title");
+  ttl.innerHTML = t("title").split(/(?<=\.)\s+/).map(x => `<span>${x}</span>`).join("");
   document.querySelectorAll("[data-i18n-aria]").forEach(el => el.setAttribute("aria-label", t(el.dataset.i18nAria)));
   document.querySelectorAll(".langs button").forEach(b => b.setAttribute("aria-pressed", b.dataset.lang === lang));
   document.getElementById("legalBody").innerHTML = t("legalHtml");
@@ -235,6 +238,7 @@ function pick(btn){
     busy = false;
     if (reading.length === 3){
       readingSec.classList.add("complete"); again.hidden = false;
+      try { history.pushState({encore:"done"}, ""); } catch (_) {}   // phone "back" returns to the fan
       renderVerdict(); setTimeout(() => verdict.classList.add("show"), 1100);
       setTimeout(() => document.getElementById("slots").scrollIntoView({behavior:"smooth", block:"start"}), 900);
     }
@@ -266,7 +270,9 @@ function resetReading(){
   pool = shuffle(CARDS.map((c,i)=>c.img ? i : -1).filter(i=>i>=0));
   buildFan(); renderSlotTexts(); updatePrompt();
 }
-again.addEventListener("click", () => { resetReading(); readingSec.scrollIntoView({behavior:"smooth"}); });
+function backToFan(){ resetReading(); readingSec.scrollIntoView({behavior:"smooth"}); }
+again.addEventListener("click", () => { if (history.state && history.state.encore === "done") history.back(); else backToFan(); });
+addEventListener("popstate", () => { if (readingSec.classList.contains("complete")) backToFan(); });
 
 /* ================= CARD OF THE DAY ================= */
 function todayIdx(){
